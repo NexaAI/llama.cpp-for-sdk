@@ -23,6 +23,7 @@
 #include <vector>
 
 #include <nlohmann/json.hpp>
+#include <llama-impl.h>
 
 using json = nlohmann::ordered_json;
 
@@ -280,13 +281,13 @@ class chat_template {
                 }
                 auto example = full.substr(common_prefix_length);
                 if (example.find("tool_name") == std::string::npos && example.find("some_value") == std::string::npos) {
-                    fprintf(stderr, "Failed to infer a tool call example (possible template bug)\n");
+                    LLAMA_LOG_ERROR("Failed to infer a tool call example (possible template bug)\n");
                 } else {
                     tool_call_example_ = example;
                 }
             }
         } catch (const std::exception & e) {
-            fprintf(stderr, "Failed to generate tool call example: %s\n", e.what());
+            LLAMA_LOG_ERROR("Failed to generate tool call example: %s\n", e.what());
         }
     }
 
@@ -303,7 +304,7 @@ class chat_template {
         const nlohmann::ordered_json & extra_context = nlohmann::ordered_json(),
         bool apply_polyfills = true)
     {
-        fprintf(stderr, "[%s] Deprecated!\n", __func__);
+        LLAMA_LOG_ERROR("[%s] Deprecated!\n", __func__);
         chat_template_inputs inputs;
         inputs.messages = messages;
         inputs.tools = tools;
@@ -410,7 +411,7 @@ class chat_template {
                                     try {
                                         arguments = json::parse(arguments.get<std::string>());
                                     } catch (const std::exception & ecvt) {
-                                        fprintf(stderr, "Failed to parse arguments: %s\n", ecvt.what());
+                                        LLAMA_LOG_ERROR("Failed to parse arguments: %s\n", ecvt.what());
                                     }
                                 }
                             }
